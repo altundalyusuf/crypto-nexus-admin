@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Crypto Nexus Admin 🚧 (In Progress)
 
-## Getting Started
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
+![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20MUI%20%7C%20Redux-blue)
 
-First, run the development server:
+## Executive Summary
+
+This project is a high-performance **Backoffice Administration Panel** built to demonstrate "Enterprise-Ready" frontend architecture. It serves as an administrative tool for tracking crypto assets and managing user data.
+
+The project is designed to strictly adhere to specific technical requirements, showcasing proficiency in **Next.js 14 (App Router)**, **Material UI (MUI v5)**, and **Redux Toolkit**.
+
+## 🛠 Tech Stack & Architecture
+
+- **Framework:** Next.js 14 (App Router & Server Actions)
+- **Language:** TypeScript (Strict Mode)
+- **UI Library:** Material UI (MUI) v5 + MUI X Data Grid
+- **State Management:** Redux Toolkit (RTK) - _Used for global UI state & async data handling_
+- **Styling Engine:** Emotion (MUI Default) with SSR Registry
+- **Authentication:** Supabase Auth (Planned)
+
+## 🚀 Key Features (Planned & Implemented)
+
+- [x] **Project Infrastructure:**
+  - Next.js App Router Setup with TypeScript.
+  - MUI Theme Registry for SSR compatibility.
+  - Redux Store Configuration with Provider wrapper.
+- [x] **Layout Architecture:**
+  - Nested Layouts (Dashboard vs. Auth).
+  - Responsive Sidebar and Header components.
+- [ ] **Authentication:**
+  - Supabase integration.
+  - Protected Routes.
+- [ ] **Dashboard Analytics:**
+  - Real-time data visualization with Recharts.
+- [ ] **User Management:**
+  - Data Grid implementation for large datasets.
+  - Server-side filtering and pagination via Redux.
+
+## 📂 Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+src/
+├── app/              # Next.js App Router pages & layouts
+├── components/       # Reusable UI components (Atomic design principles)
+├── lib/              # Configuration files (Theme, Supabase client)
+├── store/            # Redux Toolkit (Slices, Store configuration)
+└── types/            # TypeScript interfaces and types
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏃‍♂️ Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Install dependencies:**
 
-## Learn More
+   ```bash
+    npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Run the development server::**
+   ```bash
+    npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| [<img src="https://github.com/altundalyusuf.png?size=115" width="115"><br><sub>@altundalyusuf</sub>](https://github.com/altundalyusuf) |
+| :------------------------------------------------------------------------------------------------------------------------------------: |

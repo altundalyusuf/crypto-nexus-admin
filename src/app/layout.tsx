@@ -18,6 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        {/* WRAPPER ORDER IS CRITICAL:
+          1. ReduxProvider: Wraps the entire app to provide the Redux Store context.
+          2. ThemeRegistry: Wraps the app to inject MUI styles and handle SSR caching.
+        */}
         <ReduxProvider>
           <ThemeRegistry>{children}</ThemeRegistry>
         </ReduxProvider>
