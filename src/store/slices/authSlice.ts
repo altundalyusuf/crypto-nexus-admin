@@ -1,31 +1,109 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { supabase } from "@/lib/supabase";
 
-// Define the initial state type
-interface AuthState {
-  isAuthenticated: boolean;
-  user: null | { email: string; id: string }; // Basic user structure for now
+// Define the User type strictly
+interface User {
+  id: string;
+  email: string;
 }
 
-// Initial state
+// Define the Auth state
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
 const initialState: AuthState = {
-  isAuthenticated: false,
   user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  error: null,
 };
 
+// Async Thunk for Login
+// This handles the async Supabase call and returns the result to the reducer
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return rejectWithValue(error.message);
+      }
+
+      if (!data.user || !data.user.email) {
+        return rejectWithValue("User data is missing");
+      }
+
+      // Return only serializable data (Redux best practice)
+      return {
+        id: data.user.id,
+        email: data.user.email,
+      };
+    } catch (error) {
+      console.error("Login error detail:", error);
+      return rejectWithValue("An unexpected error occurred during login");
+    }
+  },
+);
+
+// Async Thunk for Logout
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    const { error } = await supabase.auth.signOut();
+    if (error) return rejectWithValue(error.message);
+    return null;
+  },
+);
+
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    // Placeholder action to test the store
-    loginSuccess: (state) => {
+    // Synchronous actions if needed (e.g., clear error)
+    clearError: (state) => {
+      state.error = null;
+    },
+    // Manually set user (e.g., from local storage or session check)
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
       state.isAuthenticated = true;
     },
-    logout: (state) => {
-      state.isAuthenticated = false;
-      state.user = null;
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Handle Login Lifecycle
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
+        state.isLoading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.error = action.payload as string;
+      })
+      // Handle Logout Lifecycle
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+      });
   },
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+export const { clearError, setUser } = authSlice.actions;
 export default authSlice.reducer;
