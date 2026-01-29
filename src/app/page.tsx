@@ -1,11 +1,60 @@
+"use client"; // Essential for using hooks
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginUser, clearError } from "@/store/slices/authSlice";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  // Select specific parts of the state
+  const { isLoading, error, isAuthenticated } = useAppSelector(
+    (state) => state.auth,
+  );
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Effect: Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  // Effect: Clear errors when user types (UX improvement)
+  useEffect(() => {
+    if (error) dispatch(clearError());
+  }, [email, password, dispatch, error]);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!email || !password) return;
+
+    // Dispatch the async thunk
+    const resultAction = await dispatch(loginUser({ email, password }));
+
+    // Check if the login was successful
+    if (loginUser.fulfilled.match(resultAction)) {
+      router.push("/dashboard");
+    } else {
+      // Error handling is managed by the extraReducers in slice,
+      // but we could do local UI logic here if needed.
+      console.error("Login failed");
+    }
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -37,8 +86,19 @@ export default function LoginPage() {
             Sign in to access the backoffice
           </Typography>
 
-          <Box component="form" noValidate sx={{ mt: 1, width: "100%" }}>
-            {/* Email Input */}
+          {/* Error Feedback */}
+          {error && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1, width: "100%" }}
+          >
             <TextField
               margin="normal"
               required
@@ -48,9 +108,10 @@ export default function LoginPage() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
-
-            {/* Password Input */}
             <TextField
               margin="normal"
               required
@@ -60,16 +121,23 @@ export default function LoginPage() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
 
-            {/* Sign In Button */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, height: "48px" }}
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </Box>
         </Paper>
