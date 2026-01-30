@@ -10,7 +10,6 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
-import CircularProgress from "@mui/material/CircularProgress";
 import CustomButton from "@/components/common/CustomButton";
 
 export default function LoginPage() {
