@@ -6,9 +6,9 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchUsers, setSearchQuery } from "@/store/slices/userSlice";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import LinearProgress from "@mui/material/LinearProgress";
+import StatusBadge from "@/components/common/StatusBadge";
 
 // 1. Define the interface locally if not imported.
 // This prevents "any" type usage and tells DataGrid what to expect.
@@ -53,28 +53,7 @@ export default function UsersTable() {
         width: 150,
         // 3. Typed RenderCell: <RowType, ValueType>
         renderCell: (params: GridRenderCellParams<UserRow, string>) => {
-          // No need for 'as string', TypeScript knows it's a string now
-          const status = params.value;
-          let color:
-            | "default"
-            | "primary"
-            | "secondary"
-            | "error"
-            | "success"
-            | "warning" = "default";
-
-          if (status === "Active") color = "success";
-          if (status === "Banned") color = "error";
-          if (status === "Pending") color = "warning";
-
-          return (
-            <Chip
-              label={status}
-              color={color}
-              size="small"
-              variant="outlined"
-            />
-          );
+          return <StatusBadge status={params.value as string} />;
         },
       },
       {

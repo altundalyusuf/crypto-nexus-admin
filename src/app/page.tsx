@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loginUser, clearError } from "@/store/slices/authSlice";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+import CustomButton from "@/components/common/CustomButton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -126,19 +126,15 @@ export default function LoginPage() {
               disabled={isLoading}
             />
 
-            <Button
+            <CustomButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, height: "48px" }}
-              disabled={isLoading}
+              isLoading={isLoading}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
+              Sign In
+            </CustomButton>
           </Box>
         </Paper>
       </Box>
