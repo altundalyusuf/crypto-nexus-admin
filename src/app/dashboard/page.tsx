@@ -5,19 +5,17 @@ import TransactionChart from "@/components/dashboard/TransactionChart";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import CryptoMarketTable from "@/components/dashboard/CryptoMarketTable";
+import { getUsersFromServer } from "@/app/actions/getUsers"; // REAL DATA ACTION
 
-// MOCK DATA FETCHING
-// In a real app, this would be a direct database call using Supabase Admin Client
-async function getDashboardData() {
-  // Simulate network delay
+// MOCK DATA FETCHING (Only for metrics we don't have a backend for)
+// We keep this because we don't have a real 'Transaction' database yet.
+async function getSimulatedMetrics() {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   return {
-    stats: {
-      totalUsers: 1250,
-      activeSessions: 340,
-      totalVolume: "$4.2M",
-    },
+    activeSessions: 340, // Supabase doesn't provide realtime active session count easily
+    totalVolume: "$4.2M", // We don't have a transaction ledger
     chartData: [
       { name: "Mon", amount: 4000 },
       { name: "Tue", amount: 3000 },
@@ -31,8 +29,12 @@ async function getDashboardData() {
 }
 
 export default async function DashboardPage() {
-  // Fetch data on the server
-  const data = await getDashboardData();
+  // 1. Fetch REAL User Data from Supabase
+  const users = await getUsersFromServer();
+  const realUserCount = users.length;
+
+  // 2. Fetch Simulated Data (for charts/volume)
+  const metrics = await getSimulatedMetrics();
 
   return (
     <Box>
@@ -40,39 +42,47 @@ export default async function DashboardPage() {
         spacing={3} adds consistent gaps between items
       */}
       <Grid container spacing={3}>
-        {/* Stat Cards Row */}
+        {/* 1. REAL DATA: Total Users */}
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
             title="Total Users"
-            value={data.stats.totalUsers}
+            value={realUserCount} // Connected to Real Supabase Data!
             icon={<PeopleAltIcon sx={{ color: "white" }} />}
-            trend="+12% vs last month"
+            trend="+100% Real"
             trendColor="success.main"
           />
         </Grid>
 
+        {/* 2. SIMULATED: Active Sessions */}
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
             title="Active Sessions"
-            value={data.stats.activeSessions}
+            value={metrics.activeSessions}
             icon={<SwapHorizIcon sx={{ color: "white" }} />}
             trend="-5% vs yesterday"
             trendColor="error.main"
           />
         </Grid>
 
+        {/* 3. SIMULATED: Total Volume */}
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
             title="Total Volume"
-            value={data.stats.totalVolume}
+            value={metrics.totalVolume}
             icon={<AttachMoneyIcon sx={{ color: "white" }} />}
           />
         </Grid>
 
-        {/* Chart Row */}
+        {/* Chart Row (Simulated History) */}
         <Grid size={{ xs: 12 }}>
           {/* Pass the server-fetched data to the client component */}
-          <TransactionChart data={data.chartData} />
+          <TransactionChart data={metrics.chartData} />
+        </Grid>
+
+        {/* 4. REAL DATA: Market Table (Coinranking) */}
+        <Grid size={{ xs: 12 }}>
+          {/* Displays real-time data from Coinranking API */}
+          <CryptoMarketTable />
         </Grid>
       </Grid>
     </Box>

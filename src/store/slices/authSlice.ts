@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { supabase } from "@/lib/supabase";
+import { getUsersFromServer } from "@/app/actions/getUsers";
 
 // Define the User type strictly
 interface User {
@@ -65,6 +66,13 @@ export const logoutUser = createAsyncThunk(
     return null;
   },
 );
+
+// Async Thunk for Fetching Users
+export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
+  // Call Server Action
+  const users = await getUsersFromServer();
+  return users;
+});
 
 const authSlice = createSlice({
   name: "auth",

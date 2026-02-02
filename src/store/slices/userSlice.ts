@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getUsersFromServer } from "@/app/actions/getUsers";
 
 // 1. Define strict types
 export interface UserData {
@@ -17,19 +18,6 @@ interface UserState {
   error: string | null;
 }
 
-// 2. Mock Data Generator (Simulating a DB response)
-const generateMockUsers = (): UserData[] => {
-  return Array.from({ length: 50 }, (_, i) => ({
-    id: `usr_${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    fullName: `User Name ${i + 1}`,
-    status: i % 3 === 0 ? "Banned" : i % 2 === 0 ? "Pending" : "Active",
-    lastLogin: new Date(
-      Date.now() - Math.floor(Math.random() * 10000000000),
-    ).toISOString(),
-  }));
-};
-
 const initialState: UserState = {
   users: [],
   filteredUsers: [],
@@ -38,18 +26,25 @@ const initialState: UserState = {
   error: null,
 };
 
-// 3. Async Thunk to fetch users
-export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  return generateMockUsers();
-});
+// 2. Async Thunk to fetch users
+export const fetchUsers = createAsyncThunk(
+  "users/fetchUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const users = await getUsersFromServer();
+      return users;
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue("Failed to fetch user list");
+    }
+  },
+);
 
 const userSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    // REDUX SEARCH LOGIC: This is the critical interview point
+    // Redux Search Logic (Client-side filtering of server data)
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
       const query = action.payload.toLowerCase();
@@ -73,6 +68,10 @@ const userSlice = createSlice({
         state.users = action.payload;
         // Initialize filtered list with all users
         state.filteredUsers = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
       });
   },
 });
