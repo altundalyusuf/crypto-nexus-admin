@@ -1,32 +1,39 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchUsers, setSearchQuery } from "@/store/slices/userSlice";
+import { fetchUsers, setSearchQuery, UserData } from "@/store/slices/userSlice";
+import { toggleUserBanStatus } from "@/app/actions/userActions";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
-import LinearProgress from "@mui/material/LinearProgress";
 import StatusBadge from "@/components/common/StatusBadge";
+import CustomLoadingOverlay from "../common/CustomLoadingOverlay";
+import { Alert, Snackbar } from "@mui/material";
 
-// 1. Define the interface locally if not imported.
-// This prevents "any" type usage and tells DataGrid what to expect.
-interface UserRow {
-  id: string;
-  fullName: string;
-  email: string;
-  status: string;
-  lastLogin: string | null;
-}
+// UI Imports
+import Button from "@mui/material/Button";
+import BlockIcon from "@mui/icons-material/Block";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 export default function UsersTable() {
   const dispatch = useAppDispatch();
-  // Using 'any' for filteredUsers momentarily if your slice type isn't exported,
-  // but ideally, this should be typed in the selector.
   const { filteredUsers, status, searchQuery } = useAppSelector(
     (state) => state.users,
   );
+
+  // Local state for feedback
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   // Fetch users on mount
   useEffect(() => {
@@ -40,9 +47,30 @@ export default function UsersTable() {
     dispatch(setSearchQuery(event.target.value));
   };
 
-  // Define Columns (Memoized for performance)
-  // 2. Added Generic <UserRow> to GridColDef
-  const columns: GridColDef<UserRow>[] = useMemo(
+  // 1. FIX: Wrap handleToggleBan with useCallback to make it stable across renders
+  const handleToggleBan = useCallback(
+    async (userId: string, currentStatus: string) => {
+      const isBanned = currentStatus === "Banned";
+      const shouldBan = !isBanned;
+
+      setActionLoading(userId);
+
+      // Call Server Action
+      const result = await toggleUserBanStatus(userId, shouldBan);
+
+      if (result.success) {
+        setToast({ open: true, message: result.message, severity: "success" });
+        dispatch(fetchUsers());
+      } else {
+        setToast({ open: true, message: result.message, severity: "error" });
+      }
+
+      setActionLoading(null);
+    },
+    [dispatch],
+  ); // Dispatch is stable but linter likes it listed
+
+  const columns: GridColDef<UserData>[] = useMemo(
     () => [
       { field: "id", headerName: "ID", width: 90 },
       { field: "fullName", headerName: "Full Name", width: 200 },
@@ -51,8 +79,7 @@ export default function UsersTable() {
         field: "status",
         headerName: "Status",
         width: 150,
-        // 3. Typed RenderCell: <RowType, ValueType>
-        renderCell: (params: GridRenderCellParams<UserRow, string>) => {
+        renderCell: (params: GridRenderCellParams<UserData, string>) => {
           return <StatusBadge status={params.value as string} />;
         },
       },
@@ -60,28 +87,42 @@ export default function UsersTable() {
         field: "lastLogin",
         headerName: "Last Login",
         width: 220,
-        // 4. CRITICAL FIX: valueFormatter now receives the value directly, not params.
         valueFormatter: (value: string | null) => {
-          // Safe date formatting check
           if (!value) return "";
           return new Date(value).toLocaleString();
         },
       },
-    ],
-    [],
-  );
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 150,
+        sortable: false,
+        renderCell: (params: GridRenderCellParams<UserData>) => {
+          const user = params.row;
+          const isBanned = user.status === "Banned";
+          const isLoading = actionLoading === user.id;
 
-  function CustomLoadingOverlay() {
-    return (
-      <Box sx={{ width: "100%" }}>
-        <LinearProgress />
-      </Box>
-    );
-  }
+          return (
+            <Button
+              variant="contained"
+              color={isBanned ? "success" : "error"}
+              size="small"
+              startIcon={isBanned ? <CheckCircleIcon /> : <BlockIcon />}
+              onClick={() => handleToggleBan(user.id, user.status)}
+              disabled={isLoading}
+              sx={{ textTransform: "none" }}
+            >
+              {isLoading ? "Wait..." : isBanned ? "Unban" : "Ban"}
+            </Button>
+          );
+        },
+      },
+    ],
+    [actionLoading, handleToggleBan],
+  );
 
   return (
     <Paper sx={{ width: "100%", p: 2 }}>
-      {/* Search Bar connected to Redux */}
       <Box sx={{ mb: 2 }}>
         <TextField
           label="Search Users"
@@ -93,7 +134,6 @@ export default function UsersTable() {
         />
       </Box>
 
-      {/* Loading State */}
       <Box sx={{ height: 500, width: "100%" }}>
         <DataGrid
           rows={filteredUsers}
@@ -108,10 +148,20 @@ export default function UsersTable() {
             },
           }}
           pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
+          checkboxSelection={false}
           disableRowSelectionOnClick
         />
       </Box>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={() => setToast({ ...toast, open: false })}
+      >
+        <Alert severity={toast.severity} sx={{ width: "100%" }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }
