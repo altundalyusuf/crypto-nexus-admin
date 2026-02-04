@@ -1,4 +1,4 @@
-"use client"; // Essential for using hooks
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,6 @@ export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  // Select specific parts of the state
   const { isLoading, error, isAuthenticated } = useAppSelector(
     (state) => state.auth,
   );
@@ -24,33 +23,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Effect: Redirect if already authenticated
+  // Redirect if authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, router]);
 
-  // Effect: Clear errors when user types (UX improvement)
-  useEffect(() => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    // Clear error only if it exists
     if (error) dispatch(clearError());
-  }, [email, password, dispatch, error]);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    // Clear error only if it exists
+    if (error) dispatch(clearError());
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!email || !password) return;
 
-    // Dispatch the async thunk
+    // Explicitly clear any previous stale errors before new attempt
+    if (error) dispatch(clearError());
+
     const resultAction = await dispatch(loginUser({ email, password }));
 
-    // Check if the login was successful
     if (loginUser.fulfilled.match(resultAction)) {
       router.push("/dashboard");
     } else {
-      // Error handling is managed by the extraReducers in slice,
-      // but we could do local UI logic here if needed.
-      console.error("Login failed");
+      // Logic handles itself via Redux state -> 'error' updates -> UI re-renders
+      console.error("Login failed:", resultAction.payload);
     }
   };
 
@@ -108,8 +114,9 @@ export default function LoginPage() {
               autoComplete="email"
               autoFocus
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               disabled={isLoading}
+              error={!!error} // Visual feedback on input border too
             />
             <TextField
               margin="normal"
@@ -121,8 +128,9 @@ export default function LoginPage() {
               id="password"
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               disabled={isLoading}
+              error={!!error}
             />
 
             <CustomButton

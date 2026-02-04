@@ -1,7 +1,6 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { revalidatePath } from "next/cache";
 
 // Define the response type for client handling
 type ActionResponse = {
