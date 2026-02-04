@@ -3,7 +3,12 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchUsers, setSearchQuery, UserData } from "@/store/slices/userSlice";
+import {
+  fetchUsers,
+  setSearchQuery,
+  updateUserStatusInStore,
+  UserData,
+} from "@/store/slices/userSlice";
 import { toggleUserBanStatus } from "@/app/actions/userActions";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -60,9 +65,15 @@ export default function UsersTable() {
 
       if (result.success) {
         setToast({ open: true, message: result.message, severity: "success" });
-        dispatch(fetchUsers());
+        dispatch(
+          updateUserStatusInStore({
+            userId,
+            status: shouldBan ? "Banned" : "Active",
+          }),
+        );
       } else {
         setToast({ open: true, message: result.message, severity: "error" });
+        dispatch(fetchUsers());
       }
 
       setActionLoading(null);
@@ -97,6 +108,9 @@ export default function UsersTable() {
         headerName: "Actions",
         width: 150,
         sortable: false,
+        valueGetter: (_value: unknown, row: UserData) => {
+          return row.status;
+        },
         renderCell: (params: GridRenderCellParams<UserData>) => {
           const user = params.row;
           const isBanned = user.status === "Banned";
@@ -104,11 +118,15 @@ export default function UsersTable() {
 
           return (
             <Button
+              key={`${user.id}-${user.status}`}
               variant="contained"
               color={isBanned ? "success" : "error"}
               size="small"
               startIcon={isBanned ? <CheckCircleIcon /> : <BlockIcon />}
-              onClick={() => handleToggleBan(user.id, user.status)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleBan(user.id, user.status);
+              }}
               disabled={isLoading}
               sx={{ textTransform: "none" }}
             >

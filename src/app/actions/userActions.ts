@@ -22,11 +22,11 @@ export async function toggleUserBanStatus(
     // Determine ban duration.
     // To ban: set a date far in the future (e.g., year 2099).
     // To unban: set 'banned_until' to null or undefined.
-    const banDuration = shouldBan ? "2099-01-01T00:00:00Z" : null;
+    const banDuration = shouldBan ? "876000h" : "none";
 
     // Supabase Admin: Update user attributes
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-      ban_duration: banDuration ? "876000h" : "none", // Alternative way, but usually 'banned_until' is managed internally or via attributes
+      ban_duration: banDuration,
       user_metadata: {
         // We can also flag it in metadata for easy UI access if needed
         is_banned: shouldBan,
@@ -46,9 +46,6 @@ export async function toggleUserBanStatus(
       console.error("Ban Action Error:", error);
       throw new Error(error.message);
     }
-
-    // Revalidate the dashboard users page to refresh data immediately
-    revalidatePath("/dashboard/users");
 
     return {
       success: true,

@@ -56,6 +56,26 @@ const userSlice = createSlice({
           user.fullName.toLowerCase().includes(query),
       );
     },
+    updateUserStatusInStore: (
+      state,
+      action: PayloadAction<{ userId: string; status: string }>,
+    ) => {
+      const { userId, status } = action.payload;
+      const userIndex = state.users.findIndex((u) => u.id === userId);
+
+      if (userIndex !== -1) {
+        // Update Master List
+        state.users[userIndex].status = status as UserData["status"];
+
+        // Update Filtered List (Re-filter from master to ensure consistency)
+        const query = state.searchQuery.toLowerCase();
+        state.filteredUsers = state.users.filter(
+          (user) =>
+            user.email.toLowerCase().includes(query) ||
+            user.fullName.toLowerCase().includes(query),
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -76,5 +96,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setSearchQuery } = userSlice.actions;
+export const { setSearchQuery, updateUserStatusInStore } = userSlice.actions;
 export default userSlice.reducer;
