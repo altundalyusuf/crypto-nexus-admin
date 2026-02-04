@@ -23,7 +23,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Redirect if authenticated
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/dashboard");
@@ -32,13 +33,11 @@ export default function LoginPage() {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    // Clear error only if it exists
     if (error) dispatch(clearError());
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    // Clear error only if it exists
     if (error) dispatch(clearError());
   };
 
@@ -47,18 +46,18 @@ export default function LoginPage() {
 
     if (!email || !password) return;
 
-    // Explicitly clear any previous stale errors before new attempt
-    if (error) dispatch(clearError());
-
     const resultAction = await dispatch(loginUser({ email, password }));
 
     if (loginUser.fulfilled.match(resultAction)) {
+      setIsRedirecting(true);
       router.push("/dashboard");
     } else {
-      // Logic handles itself via Redux state -> 'error' updates -> UI re-renders
       console.error("Login failed:", resultAction.payload);
     }
   };
+
+  // 3. FIX: Total loading durumu
+  const isButtonLoading = isLoading || isRedirecting;
 
   return (
     <Container component="main" maxWidth="xs">
@@ -115,8 +114,8 @@ export default function LoginPage() {
               autoFocus
               value={email}
               onChange={handleEmailChange}
-              disabled={isLoading}
-              error={!!error} // Visual feedback on input border too
+              disabled={isButtonLoading}
+              error={!!error}
             />
             <TextField
               margin="normal"
@@ -129,7 +128,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={handlePasswordChange}
-              disabled={isLoading}
+              disabled={isButtonLoading}
               error={!!error}
             />
 
@@ -138,7 +137,7 @@ export default function LoginPage() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, height: "48px" }}
-              isLoading={isLoading}
+              isLoading={isButtonLoading}
             >
               Sign In
             </CustomButton>

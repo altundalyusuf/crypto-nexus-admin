@@ -32,6 +32,8 @@ export const loginUser = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
+      await supabase.auth.signOut();
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
