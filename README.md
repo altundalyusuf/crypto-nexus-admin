@@ -6,7 +6,7 @@
 
 This project is a modern **Backoffice Management System** designed for the **Crypto Tracking** mobile application. It allows administrators to manage real registered users, control system access (Ban/Unban functionality), and monitor live cryptocurrency market data.
 
-Built with **Next.js 14 (App Router)**, the system prioritizes security, scalability, and a seamless user experience using modern web architecture standards.
+Built with **Next.js (App Router)**, the system prioritizes security, scalability, and a seamless user experience using modern web architecture standards.
 
 ### 🔗 Links
 
@@ -27,7 +27,7 @@ _(Note: This account is in "Read-Only/Demo Mode". Mutations like banning are sim
 
 This project goes beyond basic implementation, utilizing an **Enterprise-level** stack to ensure robustness and security.
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **State Management:** Redux Toolkit (with Async Thunks)
 - **Backend & Auth:** Supabase (Auth, Database & Admin API)
