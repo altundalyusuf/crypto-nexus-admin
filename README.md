@@ -13,6 +13,14 @@ Built with **Next.js 14 (App Router)**, the system prioritizes security, scalabi
 - **🚀 Live Demo:** [[Crypto Nexus Admin Web App](https://crypto-nexus-admin.vercel.app)]
 - **📱 Related Mobile Project:** [[Mobile-Crypto-Tracking-App](https://github.com/altundalyusuf/Mobile-Crypto-Tracking-App)]
 
+### 🔐 Demo Credentials
+
+To explore the live dashboard and test server actions safely, use the following demo account.
+_(Note: This account is in "Read-Only/Demo Mode". Mutations like banning are simulated to protect real user data.)_
+
+- **Email:** demo@admin.com
+- **Password:** test123
+
 ---
 
 ## 🛠️ Tech Stack
