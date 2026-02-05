@@ -10,7 +10,7 @@ Built with **Next.js 14 (App Router)**, the system prioritizes security, scalabi
 
 ### 🔗 Links
 
-- **🚀 Live Demo:** [INSERT_VERCEL_LINK_HERE]
+- **🚀 Live Demo:** [[Crypto Nexus Admin Web App](https://crypto-nexus-admin.vercel.app)]
 - **📱 Related Mobile Project:** [[Mobile-Crypto-Tracking-App](https://github.com/altundalyusuf/Mobile-Crypto-Tracking-App)]
 
 ---
