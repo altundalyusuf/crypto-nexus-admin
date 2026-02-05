@@ -1,68 +1,111 @@
-# Crypto Nexus Admin 🚧 (In Progress)
+# Crypto Nexus - Backoffice Management System
 
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
-![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20MUI%20%7C%20Redux-blue)
+![Project Banner](public/screenshots/dashboard.png)
 
-## Executive Summary
+## 📋 About the Project
 
-This project is a high-performance **Backoffice Administration Panel** built to demonstrate "Enterprise-Ready" frontend architecture. It serves as an administrative tool for tracking crypto assets and managing user data.
+This project is a modern **Backoffice Management System** designed for the **Crypto Tracking** mobile application. It allows administrators to manage real registered users, control system access (Ban/Unban functionality), and monitor live cryptocurrency market data.
 
-The project is designed to strictly adhere to specific technical requirements, showcasing proficiency in **Next.js 14 (App Router)**, **Material UI (MUI v5)**, and **Redux Toolkit**.
+Built with **Next.js 14 (App Router)**, the system prioritizes security, scalability, and a seamless user experience using modern web architecture standards.
 
-## 🛠 Tech Stack & Architecture
+### 🔗 Links
 
-- **Framework:** Next.js 14 (App Router & Server Actions)
-- **Language:** TypeScript (Strict Mode)
-- **UI Library:** Material UI (MUI) v5 + MUI X Data Grid
-- **State Management:** Redux Toolkit (RTK) - _Used for global UI state & async data handling_
-- **Styling Engine:** Emotion (MUI Default) with SSR Registry
-- **Authentication:** Supabase Auth (Planned)
+- **🚀 Live Demo:** [INSERT_VERCEL_LINK_HERE]
+- **📱 Related Mobile Project:** [[Mobile-Crypto-Tracking-App](https://github.com/altundalyusuf/Mobile-Crypto-Tracking-App)]
 
-## 🚀 Key Features (Planned & Implemented)
+---
 
-- [x] **Project Infrastructure:**
-  - Next.js App Router Setup with TypeScript.
-  - MUI Theme Registry for SSR compatibility.
-  - Redux Store Configuration with Provider wrapper.
-- [x] **Layout Architecture:**
-  - Nested Layouts (Dashboard vs. Auth).
-  - Responsive Sidebar and Header components.
-- [ ] **Authentication:**
-  - Supabase integration.
-  - Protected Routes.
-- [ ] **Dashboard Analytics:**
-  - Real-time data visualization with Recharts.
-- [ ] **User Management:**
-  - Data Grid implementation for large datasets.
-  - Server-side filtering and pagination via Redux.
+## 🛠️ Tech Stack
 
-## 📂 Project Structure
+This project goes beyond basic implementation, utilizing an **Enterprise-level** stack to ensure robustness and security.
 
-```bash
-src/
-├── app/              # Next.js App Router pages & layouts
-├── components/       # Reusable UI components (Atomic design principles)
-├── lib/              # Configuration files (Theme, Supabase client)
-├── store/            # Redux Toolkit (Slices, Store configuration)
-└── types/            # TypeScript interfaces and types
-```
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **State Management:** Redux Toolkit (with Async Thunks)
+- **Backend & Auth:** Supabase (Auth, Database & Admin API)
+- **Styling:** Material UI (MUI)
+- **Data Fetching:** Server Actions & REST API (Coinranking)
+- **Security:** Next.js Middleware & Supabase SSR
 
-## 🏃‍♂️ Getting Started
+---
+
+## 💡 Key Architectural Decisions
+
+_Highlights of the engineering challenges solved and architectural choices made in this project:_
+
+### 1. Security & Middleware (The Gatekeeper)
+
+Client-side redirects are insufficient for admin security. This project implements **Next.js Middleware** to intercept requests at the server level.
+
+- **Supabase SSR:** Utilizes HttpOnly cookies for secure session management.
+- **Protected Routes:** Unauthorized users are blocked at the edge before the page renders and redirected to login.
+
+### 2. Server Actions for Database Mutations
+
+Instead of exposing sensitive API keys via client-side REST calls, **Server Actions** are used for critical operations like banning users.
+
+- **Why?** It keeps the `SUPABASE_SERVICE_ROLE_KEY` strictly on the server, preventing privilege escalation attacks.
+
+### 3. Solving Race Conditions (Async Synchronization)
+
+To prevent "UI Glitches" (e.g., a button flashing the old state after a click), the project uses **Redux Toolkit** methods.
+
+### 4. Hybrid Data Architecture
+
+- **Real Data:** User management (Supabase Auth) and Market Data (Coinranking API) operate on live production data.
+- **Simulation:** Transaction volume charts utilize simulated data to demonstrate frontend visualization capabilities (Recharts) pending the integration of a transaction ledger.
+
+---
+
+## 📸 Screenshots
+
+### 1. Secure Login
+
+Authentication with error handling and secure session establishment.
+![Login Screen](public/screenshots/login.png)
+
+### 2. User Management (Interactivity)
+
+Real-time searching, status monitoring, and Server-Side Ban/Unban actions.
+![Users Screen](public/screenshots/user-management.png)
+
+### 3. Dashboard & Market Tracking
+
+Live crypto metrics and analytical summaries.
+![Dashboard Screen](public/screenshots/dashboard.png)
+
+### 4. Live Market Data
+
+Live crypto metrics with top 10 coins.
+![Dashboard Screen](public/screenshots/live-market.png)
+
+---
+
+## 🚀 Getting Started (Local Development)
+
+Follow these steps to run the project locally:
 
 1. **Clone the repository**
 
 2. **Install dependencies:**
 
    ```bash
-    npm install
+   npm install
    ```
 
-3. **Run the development server::**
+3. **Configure Environment Variables: Create a .env.local file in the root directory and add your Supabase credentials:**
+
    ```bash
-    npm run dev
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 
-## Author
+4. **Run the development server:**
 
-| [<img src="https://github.com/altundalyusuf.png?size=115" width="115"><br><sub>@altundalyusuf</sub>](https://github.com/altundalyusuf) |
-| :------------------------------------------------------------------------------------------------------------------------------------: |
+   ```bash
+   npm run dev
+   ```
+
+5. **Run the development server:**
+   Open your browser: Navigate to http://localhost:3000 to view the application.
